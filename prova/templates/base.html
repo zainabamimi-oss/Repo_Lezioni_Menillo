@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Prova{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+  <div class="nav-container">
+    <a href="{{ url_for('index') }}" class="logo">
+      <div class="logo-icon"><i class="fas fa-graduation-cap"></i></div>
+      {# ══════════════════════════════════════════════════
+         NOME SITO – per cambiarlo basta modificare qui:
+         ══════════════════════════════════════════════════ #}
+      Prova
+    </a>
+    <ul class="nav-links">
+      <li><a href="{{ url_for('index') }}" {% if request.endpoint == 'index' %}class="active"{% endif %}>Home</a></li>
+      <li><a href="{{ url_for('corsi') }}" {% if request.endpoint in ('corsi','dettaglio') %}class="active"{% endif %}>Corsi</a></li>
+      <li><a href="{{ url_for('index') }}#caratteristiche">Caratteristiche</a></li>
+      <li><a href="{{ url_for('index') }}#contatti">Contatti</a></li>
+      <li><a href="{{ url_for('corsi') }}" class="nav-cta">Scopri i Corsi</a></li>
+    </ul>
+  </div>
+</nav>
+
+{% block content %}{% endblock %}
+
+<!-- FOOTER -->
+<footer id="contatti">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="{{ url_for('index') }}" class="logo" style="color:white;">
+        <div class="logo-icon"><i class="fas fa-graduation-cap"></i></div>
+        Prova
+      </a>
+      <p>Piattaforma professionale per la gestione e la fruizione di corsi aziendali di alta qualità. Investi nel tuo futuro con noi.</p>
+    </div>
+    <div class="footer-links">
+      <h4>Esplora</h4>
+      <ul>
+        <li><a href="{{ url_for('index') }}">Home</a></li>
+        <li><a href="{{ url_for('corsi') }}">Tutti i Corsi</a></li>
+        <li><a href="{{ url_for('index') }}#caratteristiche">Caratteristiche</a></li>
+      </ul>
+    </div>
+    <div class="footer-links">
+      <h4>Supporto</h4>
+      <ul>
+        <li><a href="#">FAQ</a></li>
+        <li><a href="#">Assistenza</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Cookie Policy</a></li>
+      </ul>
+    </div>
+    <div class="footer-links">
+      <h4>Contatti</h4>
+      <ul>
+        <li><a href="mailto:info@prova.it">info@prova.it</a></li>
+        <li><a href="tel:+390123456789">+39 012 345 6789</a></li>
+        <li><a href="#">Via Roma 123, Milano</a></li>
+        <li><a href="#">Lun–Ven 9:00–18:00</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    {# ══════════════════════════════════════════════════
+       NOME NEL COPYRIGHT – cambia "Prova" qui sotto
+       ══════════════════════════════════════════════════ #}
+    <p>&copy; 2024/2025 Prova. Tutti i diritti riservati.</p>
+    <div class="social-links">
+      <a href="#"><i class="fab fa-linkedin-in"></i></a>
+      <a href="#"><i class="fab fa-facebook-f"></i></a>
+      <a href="#"><i class="fab fa-instagram"></i></a>
+      <a href="#"><i class="fab fa-twitter"></i></a>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMessage"></span></div>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

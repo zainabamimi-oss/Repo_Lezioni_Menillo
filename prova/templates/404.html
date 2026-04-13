@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Pagina non trovata – Prova{% endblock %}
+{% block content %}
+<div style="padding:10rem 2rem;text-align:center;min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+  <i class="fas fa-exclamation-triangle" style="font-size:3rem;color:var(--gray-300);display:block;margin-bottom:1rem;"></i>
+  <h2 style="color:var(--secondary);margin-bottom:0.5rem;">Pagina non trovata</h2>
+  <p style="color:var(--gray-500);margin-bottom:2rem;">Il corso o la pagina che cerchi non esiste.</p>
+  <a href="{{ url_for('corsi') }}" class="btn btn-primary"><i class="fas fa-arrow-left"></i> Torna ai Corsi</a>
+</div>
+{% endblock %}

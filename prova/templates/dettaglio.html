@@ -1,0 +1,301 @@
+{% extends "base.html" %}
+{% block title %}{{ corso['nome'] }} – Prova{% endblock %}
+
+{% block extra_css %}
+<style>
+.course-hero {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  padding: 7rem 2rem 3.5rem; position: relative; overflow: hidden;
+}
+.course-hero-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.12; filter: saturate(0.3); }
+.course-hero::before { content: ''; position: absolute; inset: 0; z-index: 1; background: linear-gradient(0deg, rgba(15,23,42,0.9) 0%, rgba(15,23,42,0.5) 100%); }
+.course-hero-grid { position: absolute; inset: 0; z-index: 1; background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px); background-size: 50px 50px; }
+.course-hero-inner { max-width: 1400px; margin: 0 auto; position: relative; z-index: 2; }
+.breadcrumb { display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; color: rgba(255,255,255,0.4); margin-bottom: 1.5rem; flex-wrap: wrap; }
+.breadcrumb a { color: rgba(255,255,255,0.4); text-decoration: none; transition: color .2s; }
+.breadcrumb a:hover { color: rgba(255,255,255,0.8); }
+.breadcrumb i { font-size: 0.6rem; }
+.hero-badges { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+.hero-badges .badge { font-size: 0.78rem; padding: 0.4rem 1rem; }
+.course-hero h1 { font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 800; color: white; margin-bottom: 1rem; line-height: 1.15; letter-spacing: -0.02em; }
+.hero-meta { display: flex; gap: 2rem; flex-wrap: wrap; }
+.hero-meta-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: rgba(255,255,255,0.6); }
+.hero-meta-item strong { color: white; font-weight: 600; }
+.hero-meta-item i { color: var(--accent); }
+
+.det-layout { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 1fr 360px; gap: 3rem; padding: 3.5rem 2rem 5rem; align-items: start; }
+.det-sidebar { position: sticky; top: 92px; }
+.det-block { margin-bottom: 3rem; }
+.det-block-title { font-size: 1.1rem; font-weight: 800; color: var(--secondary); margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.75rem; padding-bottom: 0.875rem; border-bottom: 2px solid var(--gray-100); }
+.det-block-title i { color: var(--primary); font-size: 1rem; }
+.det-desc { color: var(--gray-600); line-height: 1.8; font-size: 0.95rem; }
+
+.obj-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+.obj-item { display: flex; align-items: flex-start; gap: 0.75rem; background: var(--gray-50); border: 1px solid var(--gray-100); border-radius: var(--radius); padding: 0.875rem 1rem; font-size: 0.875rem; color: var(--gray-700); line-height: 1.5; transition: var(--transition); }
+.obj-item:hover { border-color: var(--primary-light); background: #eff6ff; }
+.obj-check { width: 22px; height: 22px; flex-shrink: 0; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.6rem; margin-top: 1px; }
+
+.module-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.module-item { border: 1px solid var(--gray-200); border-radius: var(--radius); overflow: hidden; background: white; transition: box-shadow .2s; }
+.module-item:hover { box-shadow: var(--shadow-md); }
+.module-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; cursor: pointer; user-select: none; transition: background .2s; }
+.module-header:hover { background: var(--gray-50); }
+.module-header-left { display: flex; align-items: center; gap: 1rem; }
+.module-num { width: 32px; height: 32px; border-radius: 50%; background: var(--primary-light); color: var(--primary); font-size: 0.75rem; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.module-name { font-weight: 600; font-size: 0.9rem; color: var(--secondary); }
+.module-right { display: flex; align-items: center; gap: 1rem; }
+.module-hours { font-size: 0.78rem; color: var(--gray-500); background: var(--gray-100); padding: 0.25rem 0.6rem; border-radius: 50px; }
+.module-toggle { color: var(--gray-400); transition: transform .25s; font-size: 0.8rem; }
+.module-item.open .module-toggle { transform: rotate(180deg); }
+.module-body { display: none; padding: 1rem 1.25rem 1.25rem 3.75rem; border-top: 1px solid var(--gray-100); }
+.module-item.open .module-body { display: block; }
+.module-body p { font-size: 0.875rem; color: var(--gray-500); line-height: 1.65; }
+
+.sessions-list { display: flex; flex-direction: column; gap: 1rem; }
+.session-card { background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 1.5rem; display: grid; grid-template-columns: 1fr auto; gap: 1.5rem; transition: var(--transition); }
+.session-card:hover { border-color: var(--primary); box-shadow: var(--shadow-md); }
+.session-card.full { opacity: 0.65; }
+.sess-num { font-size: 0.72rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.4rem; }
+.sess-dates { font-size: 1rem; font-weight: 700; color: var(--secondary); margin-bottom: 0.75rem; }
+.sess-details { display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; }
+.sess-detail { display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; color: var(--gray-500); }
+.sess-detail i { color: var(--primary); font-size: 0.75rem; }
+.sess-availability { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem; }
+.avail-bar-wrap { width: 130px; height: 7px; background: var(--gray-200); border-radius: 4px; overflow: hidden; }
+.avail-bar-fill { height: 100%; border-radius: 4px; }
+.fill-green { background: linear-gradient(90deg, var(--success), #059669); }
+.fill-amber { background: linear-gradient(90deg, var(--warning), #d97706); }
+.fill-red { background: var(--danger); }
+.avail-text { font-size: 0.8rem; font-weight: 600; color: var(--secondary); }
+.avail-text.full-text { color: var(--danger); }
+.btn-register { background: var(--primary); color: white; padding: 0.6rem 1.25rem; border: none; border-radius: var(--radius); font-weight: 600; cursor: pointer; transition: var(--transition); font-family: 'Inter', sans-serif; font-size: 0.82rem; white-space: nowrap; }
+.btn-register:hover:not(:disabled) { background: var(--primary-dark); transform: translateY(-1px); }
+.btn-register:disabled { background: var(--gray-300); cursor: not-allowed; }
+
+.sidebar-card { background: white; border-radius: var(--radius-xl); overflow: hidden; box-shadow: var(--shadow-xl); border: 1px solid var(--gray-100); }
+.sidebar-img { width: 100%; height: 190px; object-fit: cover; display: block; }
+.sidebar-body { padding: 1.5rem; }
+.sidebar-title { font-size: 1rem; font-weight: 800; color: var(--secondary); margin-bottom: 1.25rem; }
+.sidebar-row { display: flex; justify-content: space-between; align-items: center; padding: 0.7rem 0; border-bottom: 1px solid var(--gray-100); font-size: 0.875rem; }
+.sidebar-row:last-of-type { border-bottom: none; margin-bottom: 0.5rem; }
+.sidebar-row .label { color: var(--gray-500); font-weight: 500; display: flex; align-items: center; gap: 0.4rem; }
+.sidebar-row .label i { color: var(--primary); font-size: 0.8rem; }
+.sidebar-row .value { font-weight: 700; color: var(--secondary); }
+.sidebar-cta { width: 100%; padding: 1rem; margin-top: 1rem; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border: none; border-radius: var(--radius); font-weight: 700; font-size: 0.95rem; cursor: pointer; font-family: 'Inter', sans-serif; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+.sidebar-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(37,99,235,0.4); }
+.sidebar-note { font-size: 0.78rem; color: var(--gray-400); text-align: center; margin-top: 0.6rem; }
+
+.related { padding: 4rem 2rem 5rem; background: var(--gray-50); border-top: 1px solid var(--gray-200); }
+.related-inner { max-width: 1400px; margin: 0 auto; }
+.related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem; margin-top: 2rem; }
+.related-card { background: white; border-radius: var(--radius-lg); border: 1px solid var(--gray-100); overflow: hidden; text-decoration: none; color: inherit; display: flex; transition: var(--transition); }
+.related-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-3px); }
+.related-img { width: 100px; height: 100%; object-fit: cover; flex-shrink: 0; }
+.related-body { padding: 1rem; }
+.related-name { font-weight: 700; font-size: 0.9rem; color: var(--secondary); margin-bottom: 0.3rem; }
+.related-meta { font-size: 0.78rem; color: var(--gray-500); display: flex; gap: 0.75rem; }
+
+@media (max-width: 1100px) { .det-layout { grid-template-columns: 1fr; } .det-sidebar { position: static; } }
+@media (max-width: 768px) { .obj-grid { grid-template-columns: 1fr; } .session-card { grid-template-columns: 1fr; } .sess-availability { align-items: flex-start; } .avail-bar-wrap { width: 100%; } }
+</style>
+{% endblock %}
+
+{% block content %}
+
+{# ── Helper macros ── #}
+{% macro cat_class(cat) %}{{ {'Informatica':'informatica','Design':'design','Lingue':'lingue'}.get(cat,'') }}{% endmacro %}
+{% macro lvl_class(lvl) %}{{ {'Base':'base','Intermedio':'intermedio','Avanzato':'avanzato'}.get(lvl,'') }}{% endmacro %}
+
+<!-- HERO -->
+<div class="course-hero">
+  <img class="course-hero-img" src="{{ corso['immagine'] }}" alt="{{ corso['nome'] }}">
+  <div class="course-hero-grid"></div>
+  <div class="course-hero-inner">
+    <div class="breadcrumb">
+      <a href="{{ url_for('index') }}">Home</a>
+      <i class="fas fa-chevron-right"></i>
+      <a href="{{ url_for('corsi') }}">Corsi</a>
+      <i class="fas fa-chevron-right"></i>
+      <span>{{ corso['nome'] }}</span>
+    </div>
+    <div class="hero-badges">
+      <span class="badge badge-{{ cat_class(corso['categoria']) }}">{{ corso['categoria'] }}</span>
+      <span class="badge badge-{{ lvl_class(corso['livello']) }}">{{ corso['livello'] }}</span>
+    </div>
+    <h1>{{ corso['nome'] }}</h1>
+    <div class="hero-meta">
+      <div class="hero-meta-item"><i class="fas fa-clock"></i><span><strong>{{ corso['durata'] }} ore</strong> totali</span></div>
+      <div class="hero-meta-item"><i class="fas fa-layer-group"></i><span><strong>{{ moduli|length }} moduli</strong> didattici</span></div>
+      <div class="hero-meta-item"><i class="fas fa-calendar-alt"></i><span><strong>{{ sessioni|length }} sessioni</strong> programmate</span></div>
+      <div class="hero-meta-item"><i class="fas fa-user-check"></i><span>
+        <strong>{{ sessioni|selectattr('posti_liberi','gt',0)|list|length }}</strong> con posti disponibili
+      </span></div>
+    </div>
+  </div>
+</div>
+
+<!-- LAYOUT -->
+<div class="det-layout">
+
+  <!-- MAIN -->
+  <div class="det-main">
+
+    <div class="det-block anim">
+      <h2 class="det-block-title"><i class="fas fa-info-circle"></i> Descrizione del Corso</h2>
+      <p class="det-desc">{{ corso['descrizione'] }}</p>
+    </div>
+
+    {% if obiettivi %}
+    <div class="det-block anim anim-d1">
+      <h2 class="det-block-title"><i class="fas fa-bullseye"></i> Cosa imparerai</h2>
+      <div class="obj-grid">
+        {% for ob in obiettivi %}
+        <div class="obj-item">
+          <div class="obj-check"><i class="fas fa-check"></i></div>
+          {{ ob['descrizione'] }}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if moduli %}
+    <div class="det-block anim anim-d2">
+      <h2 class="det-block-title"><i class="fas fa-list-alt"></i> Programma del Corso</h2>
+      <div class="module-list">
+        {% for m in moduli %}
+        <div class="module-item" onclick="this.classList.toggle('open')">
+          <div class="module-header">
+            <div class="module-header-left">
+              <div class="module-num">{{ loop.index }}</div>
+              <div class="module-name">{{ m['titolo'] }}</div>
+            </div>
+            <div class="module-right">
+              <span class="module-hours">{{ m['ore'] }}h</span>
+              <i class="fas fa-chevron-down module-toggle"></i>
+            </div>
+          </div>
+          <div class="module-body"><p>{{ m['descrizione'] }}</p></div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if sessioni %}
+    <div class="det-block anim anim-d3">
+      <h2 class="det-block-title"><i class="fas fa-calendar-alt"></i> Sessioni Programmate</h2>
+      <div class="sessions-list">
+        {% for s in sessioni %}
+        {% set used = s['max_posti'] - s['posti_liberi'] %}
+        {% set pct = ((used / s['max_posti']) * 100)|round|int %}
+        {% set fill_cls = 'fill-green' if pct < 60 else ('fill-amber' if pct < 85 else 'fill-red') %}
+        <div class="session-card {{ 'full' if s['posti_liberi'] == 0 else '' }}">
+          <div>
+            <div class="sess-num">Sessione {{ loop.index }}</div>
+            <div class="sess-dates">{{ s['data_inizio'] }} → {{ s['data_fine'] }}</div>
+            <div class="sess-details">
+              {% if s['orario'] %}
+              <div class="sess-detail"><i class="fas fa-clock"></i> {{ s['orario'] }}</div>
+              {% endif %}
+              {% if s['luogo'] %}
+              <div class="sess-detail"><i class="fas fa-map-marker-alt"></i> {{ s['luogo'] }}</div>
+              {% endif %}
+              <div class="sess-detail"><i class="fas fa-users"></i> Max {{ s['max_posti'] }} posti</div>
+            </div>
+          </div>
+          <div class="sess-availability">
+            <div class="avail-bar-wrap">
+              <div class="avail-bar-fill {{ fill_cls }}" style="width:{{ pct }}%"></div>
+            </div>
+            {% if s['posti_liberi'] == 0 %}
+            <div class="avail-text full-text">Esaurito</div>
+            <button class="btn-register" disabled>Completo</button>
+            {% else %}
+            <div class="avail-text">{{ s['posti_liberi'] }} posti liberi</div>
+            <button class="btn-register"
+              onclick="event.preventDefault(); alert('Iscrizione effettuata con successo!')">
+              Iscriviti
+            </button>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+  </div><!-- /det-main -->
+
+  <!-- SIDEBAR -->
+  <aside class="det-sidebar">
+    <div class="sidebar-card">
+      <img class="sidebar-img" src="{{ corso['immagine'] }}" alt="{{ corso['nome'] }}">
+      <div class="sidebar-body">
+        <div class="sidebar-title">Scheda del Corso</div>
+        <div class="sidebar-row">
+          <span class="label"><i class="fas fa-tag"></i> Categoria</span>
+          <span class="value"><span class="badge badge-{{ cat_class(corso['categoria']) }}" style="font-size:.7rem;">{{ corso['categoria'] }}</span></span>
+        </div>
+        <div class="sidebar-row">
+          <span class="label"><i class="fas fa-signal"></i> Livello</span>
+          <span class="value"><span class="badge badge-{{ lvl_class(corso['livello']) }}" style="font-size:.7rem;">{{ corso['livello'] }}</span></span>
+        </div>
+        <div class="sidebar-row">
+          <span class="label"><i class="fas fa-clock"></i> Durata</span>
+          <span class="value">{{ corso['durata'] }} ore</span>
+        </div>
+        <div class="sidebar-row">
+          <span class="label"><i class="fas fa-layer-group"></i> Moduli</span>
+          <span class="value">{{ moduli|length }}</span>
+        </div>
+        <div class="sidebar-row">
+          <span class="label"><i class="fas fa-calendar"></i> Sessioni</span>
+          <span class="value">{{ sessioni|length }} disponibili</span>
+        </div>
+        <div class="sidebar-row">
+          <span class="label"><i class="fas fa-award"></i> Certificato</span>
+          <span class="value" style="color:var(--success);"><i class="fas fa-check"></i> Incluso</span>
+        </div>
+        <button class="sidebar-cta" onclick="alert('Richiesta inviata! Ti contatteremo entro 24 ore.')">
+          <i class="fas fa-paper-plane"></i> Richiedi Informazioni
+        </button>
+        <div class="sidebar-note">Risposta entro 1 giorno lavorativo</div>
+      </div>
+    </div>
+    <div style="margin-top:1rem;text-align:center;">
+      <a href="{{ url_for('corsi') }}" style="color:var(--gray-500);font-size:0.82rem;text-decoration:none;display:inline-flex;align-items:center;gap:.4rem;">
+        <i class="fas fa-arrow-left"></i> Torna al catalogo
+      </a>
+    </div>
+  </aside>
+
+</div><!-- /det-layout -->
+
+<!-- CORSI CORRELATI -->
+{% if correlati %}
+<section class="related">
+  <div class="related-inner">
+    <div class="section-header" style="text-align:left;margin:0 0 0.5rem;">
+      <span class="section-tag">Potrebbero interessarti</span>
+      <h2 class="section-title" style="font-size:1.6rem;">Corsi correlati</h2>
+    </div>
+    <div class="related-grid">
+      {% for r in correlati %}
+      <a href="{{ url_for('dettaglio', id=r['id']) }}" class="related-card">
+        <img class="related-img" src="{{ r['immagine'] }}" alt="{{ r['nome'] }}">
+        <div class="related-body">
+          <div class="related-name">{{ r['nome'] }}</div>
+          <div class="related-meta">
+            <span><i class="fas fa-clock" style="color:var(--primary);margin-right:3px;"></i>{{ r['durata'] }}h</span>
+            <span class="badge badge-{{ lvl_class(r['livello']) }}" style="font-size:.65rem;padding:.2rem .6rem;">{{ r['livello'] }}</span>
+          </div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% endblock %}

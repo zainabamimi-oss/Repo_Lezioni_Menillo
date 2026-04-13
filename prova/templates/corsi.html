@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+{% block title %}Catalogo Corsi – Prova{% endblock %}
+
+{% block extra_css %}
+<style>
+.page-hero {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  padding: 7rem 2rem 4rem; position: relative; overflow: hidden;
+}
+.page-hero::before {
+  content: ''; position: absolute; inset: 0;
+  background:
+    radial-gradient(circle at 80% 50%, rgba(6,182,212,0.12) 0%, transparent 50%),
+    radial-gradient(circle at 20% 80%, rgba(37,99,235,0.1) 0%, transparent 40%);
+}
+.page-hero-grid {
+  position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+.page-hero-inner { max-width: 1400px; margin: 0 auto; position: relative; z-index: 2; }
+.breadcrumb { display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; color: rgba(255,255,255,0.45); margin-bottom: 1.25rem; }
+.breadcrumb a { color: rgba(255,255,255,0.45); text-decoration: none; transition: color .2s; }
+.breadcrumb a:hover { color: rgba(255,255,255,0.8); }
+.breadcrumb i { font-size: 0.6rem; }
+.page-hero h1 { font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; color: white; margin-bottom: 0.75rem; letter-spacing: -0.02em; }
+.page-hero p { color: #94a3b8; font-size: 1rem; max-width: 520px; }
+
+.filter-bar {
+  background: white; border-bottom: 1px solid var(--gray-200);
+  padding: 1.25rem 2rem; position: sticky; top: 72px; z-index: 200;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.filter-bar-inner { max-width: 1400px; margin: 0 auto; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.filter-label { font-size: 0.82rem; font-weight: 600; color: var(--gray-500); white-space: nowrap; }
+.filter-btns { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.filter-btn {
+  padding: 0.5rem 1.1rem; border: 1.5px solid var(--gray-200);
+  background: white; border-radius: 50px; font-weight: 600; cursor: pointer;
+  transition: var(--transition); font-size: 0.82rem; color: var(--gray-600);
+  font-family: 'Inter', sans-serif;
+}
+.filter-btn:hover { border-color: var(--primary); color: var(--primary); }
+.filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+.search-wrap { margin-left: auto; position: relative; }
+.search-wrap i { position: absolute; left: 0.9rem; top: 50%; transform: translateY(-50%); color: var(--gray-400); font-size: 0.85rem; }
+.search-wrap input {
+  padding: 0.6rem 1rem 0.6rem 2.5rem; border: 1.5px solid var(--gray-200); border-radius: 50px;
+  width: 260px; font-size: 0.85rem; transition: var(--transition);
+  font-family: 'Inter', sans-serif; color: var(--gray-800); background: var(--gray-50);
+}
+.search-wrap input:focus { outline: none; border-color: var(--primary); background: white; box-shadow: 0 0 0 3px var(--primary-light); }
+.search-wrap input::placeholder { color: var(--gray-400); }
+.results-count { font-size: 0.8rem; color: var(--gray-500); white-space: nowrap; margin-left: 0.5rem; }
+
+.courses-section { padding: 3rem 2rem 6rem; }
+.courses-inner { max-width: 1400px; margin: 0 auto; }
+.courses-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.75rem; }
+.no-results { grid-column: 1/-1; text-align: center; padding: 4rem 2rem; color: var(--gray-400); }
+.no-results i { font-size: 2.5rem; margin-bottom: 1rem; display: block; }
+
+.course-card {
+  background: white; border-radius: var(--radius-lg); overflow: hidden;
+  box-shadow: var(--shadow); border: 1px solid var(--gray-100);
+  transition: var(--transition); cursor: pointer; display: flex; flex-direction: column;
+  text-decoration: none; color: inherit;
+}
+.course-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-xl); border-color: var(--gray-200); }
+.card-img { height: 200px; position: relative; overflow: hidden; }
+.card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+.course-card:hover .card-img img { transform: scale(1.06); }
+.card-img-overlay { position: absolute; inset: 0; background: linear-gradient(0deg, rgba(15,23,42,0.55) 0%, transparent 55%); }
+.card-badges { position: absolute; top: 0.875rem; left: 0.875rem; right: 0.875rem; display: flex; justify-content: space-between; align-items: flex-start; }
+.card-body { padding: 1.4rem 1.5rem; flex: 1; display: flex; flex-direction: column; }
+.card-title { font-size: 1.2rem; font-weight: 700; color: var(--secondary); margin-bottom: 0.5rem; }
+.card-desc { color: var(--gray-500); font-size: 0.875rem; line-height: 1.6; margin-bottom: 1.25rem; flex: 1;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.card-meta { display: flex; gap: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--gray-100); }
+.card-meta-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; color: var(--gray-500); }
+.card-meta-item i { color: var(--primary); font-size: 0.78rem; }
+.card-footer { padding: 0.9rem 1.5rem; background: var(--gray-50); border-top: 1px solid var(--gray-100); display: flex; align-items: center; justify-content: space-between; }
+.card-footer-info { font-size: 0.8rem; color: var(--gray-500); }
+.card-footer-info strong { color: var(--secondary); }
+.card-link { display: flex; align-items: center; gap: 0.4rem; color: var(--primary); font-weight: 600; font-size: 0.85rem; transition: gap 0.2s; }
+.course-card:hover .card-link { gap: 0.65rem; }
+
+@media (max-width: 768px) {
+  .filter-bar-inner { flex-direction: column; align-items: stretch; }
+  .search-wrap { margin-left: 0; }
+  .search-wrap input { width: 100%; }
+  .courses-grid { grid-template-columns: 1fr; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- HERO -->
+<div class="page-hero">
+  <div class="page-hero-grid"></div>
+  <div class="page-hero-inner">
+    <div class="breadcrumb">
+      <a href="{{ url_for('index') }}">Home</a>
+      <i class="fas fa-chevron-right"></i>
+      <span>Catalogo Corsi</span>
+    </div>
+    <h1>Catalogo Corsi</h1>
+    <p>Esplora tutti i nostri percorsi formativi. Filtra per categoria o cerca il corso che fa per te.</p>
+  </div>
+</div>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+  <div class="filter-bar-inner">
+    <span class="filter-label">Filtra per:</span>
+    <div class="filter-btns">
+      <button class="filter-btn active" data-filter="all">Tutti</button>
+      <button class="filter-btn" data-filter="informatica"><i class="fas fa-code" style="margin-right:5px;font-size:.75rem;"></i>Informatica</button>
+      <button class="filter-btn" data-filter="design"><i class="fas fa-paint-brush" style="margin-right:5px;font-size:.75rem;"></i>Design</button>
+      <button class="filter-btn" data-filter="lingue"><i class="fas fa-globe" style="margin-right:5px;font-size:.75rem;"></i>Lingue</button>
+    </div>
+    <div class="search-wrap">
+      <i class="fas fa-search"></i>
+      <input type="text" id="searchInput" placeholder="Cerca un corso...">
+    </div>
+    <span class="results-count" id="resultsCount">{{ corsi|length }} cors{{ 'o' if corsi|length == 1 else 'i' }}</span>
+  </div>
+</div>
+
+<!-- GRID CORSI -->
+<section class="courses-section">
+  <div class="courses-inner">
+    <div class="courses-grid" id="coursesGrid">
+      {% for c in corsi %}
+      <a href="{{ url_for('dettaglio', id=c['id']) }}" class="course-card"
+         data-category="{{ c['categoria']|lower }}"
+         data-name="{{ c['nome']|lower }}"
+         data-desc="{{ c['descrizione']|lower }}"
+         style="animation:fadeInUp 0.5s ease {{ loop.index0 * 0.08 }}s both;">
+        <div class="card-img">
+          <img src="{{ c['immagine'] }}" alt="{{ c['nome'] }}" loading="lazy">
+          <div class="card-img-overlay"></div>
+          <div class="card-badges">
+            <span class="badge badge-{{ c['categoria']|lower }}">{{ c['categoria'] }}</span>
+            <span class="badge badge-{{ c['livello']|lower }}">{{ c['livello'] }}</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-title">{{ c['nome'] }}</div>
+          <p class="card-desc">{{ c['descrizione_breve'] }}</p>
+          <div class="card-meta">
+            <div class="card-meta-item"><i class="fas fa-clock"></i><span>{{ c['durata'] }} ore</span></div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <span class="card-footer-info">Clicca per i dettagli</span>
+          <span class="card-link">Dettagli <i class="fas fa-arrow-right"></i></span>
+        </div>
+      </a>
+      {% else %}
+      <div class="no-results">
+        <i class="fas fa-search"></i>
+        <p>Nessun corso disponibile al momento.</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Filtro client-side (categoria + ricerca testo)
+const cards = Array.from(document.querySelectorAll('.course-card'));
+let activeFilter = 'all';
+let searchTerm = '';
+
+function applyFilters() {
+  let visible = 0;
+  cards.forEach(card => {
+    const cat = card.dataset.category;
+    const name = card.dataset.name;
+    const desc = card.dataset.desc;
+    const matchCat = activeFilter === 'all' || cat === activeFilter;
+    const matchSearch = !searchTerm || name.includes(searchTerm) || desc.includes(searchTerm) || cat.includes(searchTerm);
+    const show = matchCat && matchSearch;
+    card.style.display = show ? '' : 'none';
+    if (show) visible++;
+  });
+
+  document.getElementById('resultsCount').textContent =
+    `${visible} cors${visible === 1 ? 'o' : 'i'}`;
+
+  const grid = document.getElementById('coursesGrid');
+  let noRes = grid.querySelector('.no-results');
+  if (visible === 0) {
+    if (!noRes) {
+      noRes = document.createElement('div');
+      noRes.className = 'no-results';
+      noRes.innerHTML = '<i class="fas fa-search"></i><p>Nessun corso trovato per i criteri selezionati.</p>';
+      grid.appendChild(noRes);
+    }
+  } else if (noRes) {
+    noRes.remove();
+  }
+}
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    activeFilter = this.dataset.filter;
+    applyFilters();
+  });
+});
+
+document.getElementById('searchInput').addEventListener('input', function() {
+  searchTerm = this.value.toLowerCase().trim();
+  applyFilters();
+});
+</script>
+{% endblock %}
